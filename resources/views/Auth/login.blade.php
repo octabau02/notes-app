@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Login')
+@section('title', 'Iniciar Sesión')
 
 @section('content')
     <div class="tabcontent">
