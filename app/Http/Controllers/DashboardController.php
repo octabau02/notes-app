@@ -24,6 +24,9 @@ class DashboardController extends Controller
             if(!empty($note->updated_at)){
                 $note->updated_at = Carbon::parse($note->updated_at);
             }
+            if(!empty($note->reminder_date)){
+                $note->reminder_date = Carbon::parse($note->reminder_date);
+            }
             return $note;
         });
         $totalNotes = DB::table('notes')->where('user_id', '=', $user->id)->count();

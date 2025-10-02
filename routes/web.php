@@ -18,5 +18,6 @@ Route::get('/dashboard', [DashboardController::class, 'index']);
 
 Route::get('/notes/create', [NoteController::class, 'create'])->name('notes.create');
 Route::post('/notes/store', [NoteController::class, 'store'])->name('notes.store');
+Route::get('/notes/export/{id}', [NoteController::class, 'export'])->name('notes.export');
 Route::put('/notes/update', [NoteController::class, 'update'])->name('notes.update');
 Route::delete('notes/delete/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');

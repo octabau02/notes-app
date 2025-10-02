@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Builders\ExportJsonBuilder;
+use App\Facades\SyncNotes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,26 +34,20 @@ class NoteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $note)
     {
         $user = Auth::user();
         if(empty($user)){
             return redirect('login');
         }
-
-        $request->validate([
+        $note->validate([
             'title' => 'string|required|max:255',
-            'content' => 'string|required|max:255'
+            'content' => 'string|required|max:255',
+            'important' => 'nullable',
+            'reminder_date' => 'date|nullable'
         ]);
 
-        $note = [
-            'title' => $request->title,
-            'content' => $request->content,
-            'user_id' => $request->user()->id,
-            'created_at' => now(),
-        ];
-
-        DB::table('notes')->insert($note);
+        SyncNotes::send($note);
 
         return redirect('dashboard')->with('success', 'Nota creada satisfactoriamente.');
 
@@ -62,8 +58,20 @@ class NoteController extends Controller
      */
     public function show(string $id)
     {
-        
 
+
+    }
+
+    public function export(string $id)
+    {
+        $user = Auth::user();
+        if(empty($user)){
+            return redirect('login');
+        }
+        $note = DB::table('notes')->where('id', '=', $id)->first();
+        $exportJsonBuilder = new ExportJsonBuilder($note);
+        $exportedNote = $exportJsonBuilder->buildConfigurated();
+        return response($exportedNote);
     }
 
     /**
@@ -77,33 +85,21 @@ class NoteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(Request $note)
     {
         $user = Auth::user();
         if(empty($user)){
             return redirect('login');
         }
-        $request->validate([
-            'id' => 'integer|required',
+        $note->validate([
+            'id' => 'integer|required|exists:notes,id',
             'title' => 'string|required|max:255',
-            'content' => 'string|required|max:255'
+            'content' => 'string|required|max:255',
+            'important' => 'nullable',
+            'reminder_date' => 'date|nullable'
         ]);
-        
-        $note = DB::table('notes')->where('id', '=', $request->id)->first();
-        if($note->user_id != $user->id){
-            return redirect()->back()->withErrors(['No tienes permitido editar esta nota']);
-        }
-        if(empty($note)){
-            return redirect()->back()->withErrors(['No se encontro la nota a eliminar']);            
-        }
 
-        $updateNote = [
-            'title' => $request->title,
-            'content' => $request->content,
-            'updated_at' => now()
-        ];
-
-        DB::table('notes')->where('id', '=',$note->id)->update($updateNote);
+        SyncNotes::send($note);
 
         return redirect('dashboard')->with('success', 'Nota actualizada satisfactoriamente.');
     }
@@ -122,12 +118,12 @@ class NoteController extends Controller
             return redirect()->back()->withErrors(['No tienes permitido eliminar esta nota']);
         }
         if(empty($note)){
-            return redirect()->back()->withErrors(['No se encontro la nota a eliminar']);            
+            return redirect()->back()->withErrors(['No se encontro la nota a eliminar']);
         }
 
         if(DB::table('notes')->where('id', $note->id)->delete() != 0){
             return redirect()->back()->with(['success', 'Nota eliminada correctamente']);
         }
-        return redirect()->back()->withErrors(['Ocurrio un error']);            
+        return redirect()->back()->withErrors(['Ocurrio un error']);
     }
 }

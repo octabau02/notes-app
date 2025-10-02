@@ -64,6 +64,11 @@
             padding: 16px;
         }
 
+        .card.important{
+            border: 2px solid #e01b24;
+            background-color: #fcf4f4;
+        }
+
         .card > p{
             color: #71768d;
         }
@@ -133,6 +138,12 @@
             padding: 8px;
         }
 
+        .form-input.checkbox{
+            flex-direction: row;
+            align-items: center;
+            gap: 5px;
+        }
+
         textarea{
             resize: none;
         }
@@ -174,7 +185,13 @@
             color: white;
             border: 1px solid white;
         }
-
+        .time{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #71768d;
+            font-size: small;
+        }
         .icon{
             width: 20px;
         }
