@@ -4,7 +4,7 @@ namespace App\Builders;
 
 use Illuminate\Support\Facades\DB;
 
-class ExportJsonBuilder
+class ExportJsonBuilder implements ExportBuilderInterface
 {
     protected $note;
     protected $exportedData;

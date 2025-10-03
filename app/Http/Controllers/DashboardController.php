@@ -12,9 +12,7 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if(empty($user)){
-            return redirect('login');
-        }
+
         $notes = DB::table('notes')->where('user_id', '=', $user->id)->get();
         $notes = $notes->map(function ($note) {
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Builders\ExportJsonBuilder;
 use App\Facades\SyncNotes;
+use App\Factory\ExportDirectorFactory;
 use App\Services\ExportJsonDirector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,11 +25,6 @@ class NoteController extends Controller
      */
     public function create()
     {
-        $user = Auth::user();
-        if(empty($user)){
-            return redirect('login');
-        }
-
         return view('Notes.create');
     }
 
@@ -37,10 +33,6 @@ class NoteController extends Controller
      */
     public function store(Request $note)
     {
-        $user = Auth::user();
-        if(empty($user)){
-            return redirect('login');
-        }
         $note->validate([
             'title' => 'string|required|max:255',
             'content' => 'string|required|max:255',
@@ -63,15 +55,14 @@ class NoteController extends Controller
 
     }
 
-    public function export(string $id, ExportJsonDirector $director)
+    public function export(string $id)
     {
-        $user = Auth::user();
-        if(empty($user)){
-            return redirect('login');
-        }
         $note = DB::table('notes')->where('id', '=', $id)->first();
-        $exportJsonBuilder = new ExportJsonBuilder($note);
-        $exportedNote = $director->exportConfigurated($exportJsonBuilder);
+        $exportFormat = DB::table('metadata')->where('key', 'export_format')->value('value');
+
+        $director = new ExportDirectorFactory();
+        $exporter = $director->create($exportFormat ,$note);
+        $exportedNote = $exporter->export();
         return response($exportedNote);
     }
 
@@ -88,10 +79,6 @@ class NoteController extends Controller
      */
     public function update(Request $note)
     {
-        $user = Auth::user();
-        if(empty($user)){
-            return redirect('login');
-        }
         $note->validate([
             'id' => 'integer|required|exists:notes,id',
             'title' => 'string|required|max:255',
@@ -112,9 +99,7 @@ class NoteController extends Controller
     {
         $note = DB::table('notes')->where('id', '=', $id)->first();
         $user = Auth::user();
-        if(empty($user)){
-            return redirect('login');
-        }
+
         if($note->user_id != $user->id){
             return redirect()->back()->withErrors(['No tienes permitido eliminar esta nota']);
         }
