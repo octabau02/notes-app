@@ -17,90 +17,72 @@ class ExportJsonBuilder
     public function setId()
     {
         $this->exportedData['id'] = $this->note->id;
+        return $this;
     }
 
     public function setTitle()
     {
         $this->exportedData['titulo'] = $this->note->title;
+        return $this;
     }
 
     public function setContent()
     {
         $this->exportedData['contenido'] = $this->note->content;
+        return $this;
     }
 
     public function getType()
     {
         $this->exportedData['tipo'] = $this->note->type;
+        return $this;
     }
 
     public function setReminderDate()
     {
         $this->exportedData['fecha_recordatorio'] = $this->note->reminder_date ?? '--';
+        return $this;
     }
 
     public function setSavedIn()
     {
         $this->exportedData['guardado_en'] = $this->note->saved_in;
+        return $this;
     }
 
     public function setUser()
     {
         $this->exportedData['autor'] = DB::table('users')->where('id', $this->note->user_id)->value('name');
+        return $this;
     }
 
     public function setCreatedAt()
     {
         $this->exportedData['creado_el'] = $this->note->created_at;
+        return $this;
     }
 
     public function setUpdatedAt()
     {
         $this->exportedData['actualizado_el'] = $this->note->updated_at;
+        return $this;
     }
 
     public function setWasUpdated()
     {
         $this->exportedData['fue_actualizado'] = $this->note->updated_at ? 'Si' : 'No';
+        return $this;
     }
 
     public function setIsImportant()
     {
         $this->exportedData['es_importante'] = $this->note->type === 'important'? 'Si' : 'No';
+        return $this;
     }
 
     public function build()
     {
         return json_encode($this->exportedData);
-    }
-
-    public function buildConfigurated()
-    {
-        $exportFormat = DB::table('metadata')->where('key', 'export_format')->value('value');
-
-        switch ($exportFormat) {
-            case 'simple':
-                $this->setTitle();
-                $this->setContent();
-                return json_encode($this->exportedData);
-            case 'intermediate':
-                $this->setTitle();
-                $this->setContent();
-                $this->setUser();
-                $this->setCreatedAt();
-                return json_encode($this->exportedData);
-            case 'advanced':
-                $this->setTitle();
-                $this->setContent();
-                $this->setUser();
-                $this->setUpdatedAt();
-                $this->setWasUpdated();
-                $this->setIsImportant();
-                $this->setReminderDate();
-                return json_encode($this->exportedData);
-            default:
-                throw new \Exception("Unsupported export format: $exportFormat");
-        }
     }
 
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Builders\ExportJsonBuilder;
 use App\Facades\SyncNotes;
+use App\Services\ExportJsonDirector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -62,7 +63,7 @@ class NoteController extends Controller
 
     }
 
-    public function export(string $id)
+    public function export(string $id, ExportJsonDirector $director)
     {
         $user = Auth::user();
         if(empty($user)){
@@ -70,7 +71,7 @@ class NoteController extends Controller
         }
         $note = DB::table('notes')->where('id', '=', $id)->first();
         $exportJsonBuilder = new ExportJsonBuilder($note);
-        $exportedNote = $exportJsonBuilder->buildConfigurated();
+        $exportedNote = $director->exportConfigurated($exportJsonBuilder);
         return response($exportedNote);
     }
 

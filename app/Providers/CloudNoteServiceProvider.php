@@ -15,14 +15,7 @@ class CloudNoteServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $cloudService = DB::table('metadata')->where('key', 'cloud_service')->value('value');
-        $this->app->bind(CloudNote::class, function($app) use ($cloudService) {
-            return match ($cloudService) {
-                'keep' => new KeepAdapter(),
-                'evernote' => new EvernoteAdapter(),
-                default => new KeepAdapter(),
-            };
-        });
+        $this->app->bind(CloudNote::class);
     }
 
     /**

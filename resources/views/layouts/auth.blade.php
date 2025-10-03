@@ -10,12 +10,20 @@
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            padding: 0 16rem;
+            background-color: #ffffff;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
         }
 
         body{
-            padding: 0 16rem;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f9fafb;
+            margin: 0 auto;
+        }
+
+        main{
+            padding: 0 16rem;
         }
 
         .justify-beetween{
@@ -203,7 +211,28 @@
         }
 
         .action-button:hover{
-            border-bottom: 1px solid black;
+            border-bottom: 1px solid #dcdde6;
+        }
+
+        .user-info{
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            margin-right: 20px;
+        }
+
+        .user-icon{
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #71768d;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 15px;
+            margin-right: 10px;
         }
 
     </style>
@@ -213,9 +242,12 @@
     <header>
         <h1>Gestión de notas personales</h1>
         <div class="profile-navbar">
-            <span>{{ auth()->user()->name }}</span>
-            <span>{{ auth()->user()->email }}</span>
-            <form method="POST" action="{{ route('logout') }}">
+            <p class="user-icon">{{ mb_substr(auth()->user()->name, 0, 1) }}</p>
+            <div class="user-info">
+                <span><strong>{{ auth()->user()->name }}</strong></span>
+                <span><small>{{ auth()->user()->email }}</small></span>
+            </div>
+                <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="secondary-button button-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="icon"><!--!Font Awesome Free v7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M409 337C418.4 327.6 418.4 312.4 409 303.1L265 159C258.1 152.1 247.8 150.1 238.8 153.8C229.8 157.5 224 166.3 224 176L224 256L112 256C85.5 256 64 277.5 64 304L64 336C64 362.5 85.5 384 112 384L224 384L224 464C224 473.7 229.8 482.5 238.8 486.2C247.8 489.9 258.1 487.9 265 481L409 337zM416 480C398.3 480 384 494.3 384 512C384 529.7 398.3 544 416 544L480 544C533 544 576 501 576 448L576 192C576 139 533 96 480 96L416 96C398.3 96 384 110.3 384 128C384 145.7 398.3 160 416 160L480 160C497.7 160 512 174.3 512 192L512 448C512 465.7 497.7 480 480 480L416 480z"/></svg>
