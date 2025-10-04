@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Builders;
+namespace App\Contracts;
 
 interface ExportBuilderInterface
 {

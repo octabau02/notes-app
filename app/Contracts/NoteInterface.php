@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Factory;
+namespace App\Contracts;
 
-interface Note
+interface NoteInterface
 {
     public function create($data): int;
 

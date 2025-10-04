@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Builders\ExportJsonBuilder;
 use App\Facades\SyncNotes;
+use App\Factory\ExportBuilderFactory;
 use App\Factory\ExportDirectorFactory;
 use App\Services\ExportJsonDirector;
 use Illuminate\Http\Request;
@@ -60,9 +61,9 @@ class NoteController extends Controller
         $note = DB::table('notes')->where('id', '=', $id)->first();
         $exportFormat = DB::table('metadata')->where('key', 'export_format')->value('value');
 
-        $director = new ExportDirectorFactory();
-        $exporter = $director->create($exportFormat ,$note);
-        $exportedNote = $exporter->export();
+        $exportBuilder = ExportBuilderFactory::create($exportFormat, $note);
+        $exportedNote = $exportBuilder->build();
+
         return response($exportedNote);
     }
 

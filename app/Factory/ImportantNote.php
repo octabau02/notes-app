@@ -2,9 +2,10 @@
 
 namespace App\Factory;
 
+use App\Contracts\NoteInterface;
 use Illuminate\Support\Facades\DB;
 
-class ImportantNote implements Note
+class ImportantNote implements NoteInterface
 {
     /**
      * Create a new class instance.

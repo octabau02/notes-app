@@ -2,9 +2,11 @@
 
 namespace App\Factory;
 
+use App\Contracts\NoteInterface;
+
 class NoteFactory
 {
-    public static function create(string $type): Note
+    public static function create(string $type): NoteInterface
     {
         switch ($type) {
             case 'normal':
