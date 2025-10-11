@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="tabcontent">
-        <form method="POST" action="/login">
+        <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="form-items">
                 <label for="email">Correo</label>

@@ -3,7 +3,7 @@
 namespace App\Factory;
 
 use App\Contracts\NoteInterface;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ImportantNote implements NoteInterface
 {
@@ -15,31 +15,28 @@ class ImportantNote implements NoteInterface
 
     }
 
-    public function create($data): int
+    public function create($data)
     {
-        $note = [
-            'title' => $data->title,
-            'content' => $data->content,
-            'user_id' => $data->user()->id,
-            'reminder_date' => $data->reminder_date,
+        $nota = [
+            'title' => $data['title'],
+            'content' => $data['content'],
+            'user_id' => Auth::id(),
             'created_at' => now(),
             'type' => 'important',
         ];
 
-        return DB::table('notes')->insertGetId($note);
+        return $nota;
     }
 
-    public function update($data): int
+    public function update($data)
     {
-        $note = [
-            'title' => $data->title,
-            'content' => $data->content,
+        $nota = [
+            'title' => $data['title'],
+            'content' => $data['content'],
             'type' => 'important',
-            'reminder_date' => $data->reminder_date,
             'updated_at' => now(),
         ];
 
-        DB::table('notes')->where('id', $data->id)->update($note);
-        return $data->id;
+        return $nota;
     }
 }

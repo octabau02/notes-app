@@ -3,7 +3,7 @@
 namespace App\Factory;
 
 use App\Contracts\NoteInterface;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 class NormalNote implements NoteInterface
 {
     /**
@@ -14,30 +14,29 @@ class NormalNote implements NoteInterface
 
     }
 
-    public function create($data): int
+    public function create($data)
     {
-        $note = [
-            'title' => $data->title,
-            'content' => $data->content,
-            'user_id' => $data->user()->id,
+        $nota = [
+            'title' => $data['title'],
+            'content' => $data['content'],
+            'user_id' => Auth::id(),
             'type' => 'normal',
             'created_at' => now(),
         ];
 
-        return DB::table('notes')->insertGetId($note);
-
+        return $nota;
     }
 
-    public function update($data): int
+    public function update($data)
     {
-        $note = [
-            'title' => $data->title,
-            'content' => $data->content,
+        $nota = [
+            'title' => $data['title'],
+            'content' => $data['content'],
             'type' => 'normal',
+            'reminder_date' => null,
             'updated_at' => now(),
         ];
 
-        DB::table('notes')->where('id', $data->id)->update($note);
-        return $data->id;
+        return $nota;
     }
 }

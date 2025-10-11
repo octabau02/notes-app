@@ -111,8 +111,8 @@
             <p>Accede o crea un cuenta para gesionar tus notas</p>
 
             <div class="tab">
-                <a href="/login" class="tablinks">Iniciar sesión</button>
-                    <a href="/register" class="tablinks">Registrarse</a>
+                <a href="{{ route('login.formulario') }}" class="tablinks">Iniciar sesión</button>
+                <a href="{{ route('register.formulario') }}" class="tablinks">Registrarse</a>
             </div>
             @yield('content')
         </card>

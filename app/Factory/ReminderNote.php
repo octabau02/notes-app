@@ -3,43 +3,34 @@
 namespace App\Factory;
 
 use App\Contracts\NoteInterface;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ReminderNote implements NoteInterface
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
+    public function create($data)
     {
-        //
-    }
-
-    public function create($data): int
-    {
-        $note = [
-            'title' => $data->title,
-            'content' => $data->content,
-            'user_id' => $data->user()->id,
+        $nota = [
+            'title' => $data['title'],
+            'content' => $data['content'],
+            'user_id' => Auth::id(),
             'created_at' => now(),
             'type' => 'reminder',
-            'reminder_date' => $data->reminder_date,
+            'reminder_date' => !empty($data['reminder_date']) ? $data['reminder_date'] : null,
         ];
 
-        return DB::table('notes')->insertGetId($note);
+        return $nota;
     }
 
-    public function update($data): int
+    public function update($data)
     {
-        $note = [
-            'title' => $data->title,
-            'content' => $data->content,
+        $nota = [
+            'title' => $data['title'],
+            'content' => $data['content'],
             'type' => 'reminder',
-            'reminder_date' => $data->reminder_date,
+            'reminder_date' => !empty($data['reminder_date']) ? $data['reminder_date'] : null,
             'updated_at' => now(),
         ];
 
-        DB::table('notes')->where('id', $data->id)->update($note);
-        return $data->id;
+        return $nota;
     }
 }

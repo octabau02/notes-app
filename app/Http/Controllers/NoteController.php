@@ -2,114 +2,99 @@
 
 namespace App\Http\Controllers;
 
-use App\Builders\ExportJsonBuilder;
-use App\Facades\SyncNotes;
-use App\Factory\ExportBuilderFactory;
-use App\Factory\ExportDirectorFactory;
-use App\Services\ExportJsonDirector;
+use App\Coordidators\NoteCoordinator;
+use App\Services\NoteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class NoteController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Muestra todas las notas del usuario
      */
-    public function index()
+    public function gestor()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('Notes.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $note)
-    {
-        $note->validate([
-            'title' => 'string|required|max:255',
-            'content' => 'string|required|max:255',
-            'important' => 'nullable',
-            'reminder_date' => 'date|nullable'
-        ]);
-
-        SyncNotes::send($note);
-
-        return redirect('dashboard')->with('success', 'Nota creada satisfactoriamente.');
-
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-
-
-    }
-
-    public function export(string $id)
-    {
-        $note = DB::table('notes')->where('id', '=', $id)->first();
-        $exportFormat = DB::table('metadata')->where('key', 'export_format')->value('value');
-
-        $exportBuilder = ExportBuilderFactory::create($exportFormat, $note);
-        $exportedNote = $exportBuilder->build();
-
-        return response($exportedNote);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $note)
-    {
-        $note->validate([
-            'id' => 'integer|required|exists:notes,id',
-            'title' => 'string|required|max:255',
-            'content' => 'string|required|max:255',
-            'important' => 'nullable',
-            'reminder_date' => 'date|nullable'
-        ]);
-
-        SyncNotes::send($note);
-
-        return redirect('dashboard')->with('success', 'Nota actualizada satisfactoriamente.');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $note = DB::table('notes')->where('id', '=', $id)->first();
-        $user = Auth::user();
-
-        if($note->user_id != $user->id){
-            return redirect()->back()->withErrors(['No tienes permitido eliminar esta nota']);
+        try {
+            $notas = NoteService::listar(['user_id' => Auth::id()]);
+            $metricas = NoteService::obtenerMetricas();
+            return view('gestor', ['notas' => $notas, 'metricas' => $metricas]);
+        } catch (Throwable $error) {
+            Log::error('Ocurrio un error al mostrar el gestor' . $error);
+            return redirect()->back()->withErrors(['Ocurrio un error al mostrar el gestor']);
         }
-        if(empty($note)){
-            return redirect()->back()->withErrors(['No se encontro la nota a eliminar']);
-        }
+    }
 
-        if(DB::table('notes')->where('id', $note->id)->delete() != 0){
-            return redirect()->back()->with(['success', 'Nota eliminada correctamente']);
+    /**
+     * Guarda una nueva nota
+     */
+    public function agregar(Request $request)
+    {
+        try {
+            $notaData = $request->validate([
+                'title' => 'string|required|max:255',
+                'content' => 'string|required|max:255',
+                'important' => 'nullable',
+                'reminder_date' => 'date|nullable'
+            ]);
+
+            NoteCoordinator::crear($notaData);
+            return redirect('/')->with('success', 'Nota creada satisfactoriamente.');
+
+        } catch (Throwable $error) {
+            Log::error('Ocurrio un error al registrar la nota' . $error);
+            return redirect()->back()->withErrors(['Ocurrio un error al registrar la nota']);
+        }
+    }
+
+    public function exportar(string $id)
+    {
+        try {
+            $exportedNote = NoteCoordinator::exportar($id);
+            return response($exportedNote);
+        } catch (\Throwable $error) {
+            Log::error('Ocurrio un error al exportar la nota' . $error);
+            return redirect()->back()->withErrors(['Ocurrio un error al exportar la nota']);
+        }
+    }
+
+    /**
+     * Actualiza una nota
+     */
+    public function editar(Request $request)
+    {
+        try {
+            $notaData = $request->validate([
+                'id' => 'integer|required|exists:notes,id',
+                'title' => 'string|required|max:255',
+                'content' => 'string|required|max:255',
+                'important' => 'nullable',
+                'reminder_date' => 'date|nullable'
+            ]);
+
+            NoteService::actualizar($notaData);
+
+            return redirect('/')->with('success', 'Nota actualizada satisfactoriamente.');
+
+        } catch (\Throwable $error) {
+            Log::error('Ocurrio un error al actualizar la nota' . $error);
+            return redirect()->back()->withErrors(['Ocurrio un error al actualizar la nota']);
+        }
+    }
+
+    /**
+     * Elimina una nota
+     */
+    public function eliminar(string $id)
+    {
+        try {
+            NoteService::eliminar($id);
+
+            return redirect('/')->with('success', 'Nota eliminada satisfactoriamente.');
+        } catch (Throwable $error) {
+            Log::error('Ocurrio un error al eliminar la nota' . $error);
+            return redirect()->back()->withErrors(['Ocurrio un error al eliminar la nota']);
         }
         return redirect()->back()->withErrors(['Ocurrio un error']);
     }
