@@ -2,7 +2,13 @@
 .env
 node_modules
 vendor
-storage
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing/*
+storage/app/public/*
+!storage/app/public/.gitignore
 tests
 Dockerfile.dev
 docker-compose.yml
