@@ -12,6 +12,12 @@ Gestor de notas personales construido con Laravel 12. Permite crear, editar, eli
 - **Configuración en tiempo de ejecución** mediante tabla `metadata`
 - Autenticación por sesión (Laravel Sessions)
 
+## Demo
+
+**[notes-app-octab.fly.dev](https://notes-app-octab.fly.dev)**
+
+> Usuario: `demo@demo.com` · Contraseña: `demo1234`
+
 ## Stack
 
 - PHP 8.2
