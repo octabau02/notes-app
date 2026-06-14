@@ -40,11 +40,11 @@ class NoteController extends Controller
             ]);
 
             NoteCoordinator::crear($notaData);
-            return redirect('/')->with('success', 'Nota creada satisfactoriamente.');
+            return redirect()->route('notas.gestor')->with('success', 'Nota creada satisfactoriamente.');
 
         } catch (Throwable $error) {
             Log::error('Ocurrio un error al registrar la nota' . $error);
-            return redirect()->back()->withErrors(['Ocurrio un error al registrar la nota']);
+            return redirect()->back()->withErrors(['Ocurrio un error al registrar la nota'])->withInput();
         }
     }
 
@@ -75,11 +75,11 @@ class NoteController extends Controller
 
             NoteService::actualizar($notaData);
 
-            return redirect('/')->with('success', 'Nota actualizada satisfactoriamente.');
+            return redirect()->route('notas.gestor')->with('success', 'Nota actualizada satisfactoriamente.');
 
         } catch (\Throwable $error) {
             Log::error('Ocurrio un error al actualizar la nota' . $error);
-            return redirect()->back()->withErrors(['Ocurrio un error al actualizar la nota']);
+            return redirect()->back()->withErrors(['Ocurrio un error al actualizar la nota'])->withInput();
         }
     }
 
@@ -91,7 +91,7 @@ class NoteController extends Controller
         try {
             NoteService::eliminar($id);
 
-            return redirect('/')->with('success', 'Nota eliminada satisfactoriamente.');
+            return redirect()->route('notas.gestor')->with('success', 'Nota eliminada satisfactoriamente.');
         } catch (Throwable $error) {
             Log::error('Ocurrio un error al eliminar la nota' . $error);
             return redirect()->back()->withErrors(['Ocurrio un error al eliminar la nota']);
