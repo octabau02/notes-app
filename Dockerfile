@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
 RUN a2enmod rewrite
 
 # ─── Stage 1: Composer ───
-FROM composer:2 AS composer
+FROM base AS composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction
