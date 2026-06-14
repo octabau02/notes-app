@@ -1,4 +1,5 @@
 #!/bin/sh
+mkdir -p /var/www/html/storage/database
 php artisan package:discover --ansi
 php artisan migrate --force
 php artisan config:cache

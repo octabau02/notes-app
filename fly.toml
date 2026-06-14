@@ -19,4 +19,4 @@ primary_region = "iad"
 
 [mounts]
   source = "notes_data"
-  destination = "/var/www/html/database"
+  destination = "/var/www/html/storage/database"

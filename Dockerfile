@@ -43,7 +43,6 @@ RUN chmod +x /entrypoint.sh
 
 RUN chown -R www-data:www-data /var/www/html/storage \
     && chown -R www-data:www-data /var/www/html/bootstrap/cache \
-    && chown -R www-data:www-data /var/www/html/database \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
