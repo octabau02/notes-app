@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    libsqlite3-dev \
     && docker-php-ext-install pdo pdo_sqlite mbstring exif zip gd
 
 RUN a2enmod rewrite
