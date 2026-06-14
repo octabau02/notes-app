@@ -1,39 +1,51 @@
-FROM php:8.2-apache
+FROM php:8.2-apache AS base
 
-# Instalar dependencias necesarias para PHP y Laravel
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    zip \
-    unzip \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
-    libpq-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    libssl-dev \
-    nodejs \
-    npm \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo pdo_sqlite mbstring exif zip gd
 
-# Habilitar mod_rewrite de Apache (necesario para Laravel)
 RUN a2enmod rewrite
 
-# Instalar Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# ─── Stage 1: Composer ───
+FROM composer:2 AS composer
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Establecer directorio de trabajo
-WORKDIR /var/www/html
+# ─── Stage 2: Node ───
+FROM node:22-alpine AS node
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY vite.config.js .
+COPY resources/ resources/
+RUN npm run build
 
-# Ajustar permisos
-RUN chown -R www-data:www-data /var/www/html \
+# ─── Stage 3: Apache final ───
+FROM base
+
+COPY --from=composer /app/vendor /var/www/html/vendor
+COPY --from=node /app/public/build /var/www/html/public/build
+
+COPY . /var/www/html
+
+COPY apache.conf /etc/apache2/sites-available/000-default.conf
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+RUN chown -R www-data:www-data /var/www/html/storage \
+    && chown -R www-data:www-data /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html/database \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
-# Exponer puerto 80
-EXPOSE 80
+WORKDIR /var/www/html
 
-# Iniciar Apache
-CMD ["apache2-foreground"]
+EXPOSE 80
+ENTRYPOINT ["/entrypoint.sh"]
